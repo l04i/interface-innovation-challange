@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import re
 from tkinter import ttk,Tk 
 import customtkinter as ctk
 import tkinter as tk
@@ -65,8 +66,8 @@ class OperationalLimitsFrame(BaseFrame):
         self._create_min_soc_field()
 
     def _create_max_soc_field(self):
-        self.max_soc_var = ctk.DoubleVar(value=0.0)
-        self.initial_soc_var = ctk.DoubleVar(value=0.0)
+        self.max_soc_var = ctk.StringVar()
+        self.initial_soc_var = ctk.StringVar()
 
         fields = [
             ("Max SoC:", self.max_soc_var, 2),
@@ -74,15 +75,17 @@ class OperationalLimitsFrame(BaseFrame):
         ]
 
         for label_text, var, row in fields:
-            entry = self._create_entry_field(label_text, row, 0, 1, var)
-            entry.configure(validate='all', 
-                          validatecommand=(self.register(self._validate_entry), '%P', '%S'))
+            self._create_entry_field(label_text, row, 0, 1, var)
+            var.trace_add('write', self._validate_numeric_input)
+            var.trace_add('write', self._validate_initial_soc)
+            var.trace_add('write', self._notify_parent)
 
     def _create_min_soc_field(self):
-        self.min_soc_var = ctk.DoubleVar(value=0.0)
-        entry = self._create_entry_field("Min SoC:", 1, 0, 1, self.min_soc_var)
-        entry.configure(validate='all',
-                       validatecommand=(self.register(self._validate_entry), '%P', '%S'))
+        self.min_soc_var = ctk.StringVar()
+        self._create_entry_field("Min SoC:", 1, 0, 1, self.min_soc_var)
+        self.min_soc_var.trace_add('write', self._validate_numeric_input)
+        self.min_soc_var.trace_add('write', self._validate_initial_soc)
+        self.min_soc_var.trace_add('write', self._notify_parent)
 
     def _create_entry_field(self, label_text, row, col, span, var):
         """Creates an entry field with a placeholder and numeric validation."""
@@ -111,70 +114,45 @@ class OperationalLimitsFrame(BaseFrame):
         )
         entry.grid(row=row, column=col + span, padx=(30),
                    pady=Constants.PAD_Y, ipady=3, sticky='ew')
+
         
         if label_text == "Initial SoC:":
             self.initial_soc_entry = entry
 
-        
-        var.trace_add('write', self._validate_soc_range)
-        var.trace_add('write', self._validate_initial_soc)
-        var.trace_add('write', self._notify_parent)
-
         return entry
 
-    def _validate_entry(self, new_value, char):
-        """Validate entry as it's being typed."""
-        
-        if new_value == "":
-            return True
-            
-        
-        if char == "." and "." in new_value[:-1]:
-            return False
-
-        
-        if not (char.isdigit() or char == "."):
-            return False
-
-        try:
-            
-            if new_value:
-                value = float(new_value)
-                
-                if value < 0 or value > 100:
-                    return False
-            return True
-        except ValueError:
-            return False
-
-    def _validate_soc_range(self, *args):
-        """Ensure SoC values are within valid range."""
+    def _validate_numeric_input(self, *args):
+        """Ensure only numeric input (integers or floats) is entered."""
         for var in [self.min_soc_var, self.max_soc_var, self.initial_soc_var]:
-            try:
-                value = var.get()
-                if value < 0:
-                    var.set(0.0)
-                elif value > 100:
-                    var.set(100.0)
-            except tk.TclError:
-                var.set(0.0)
+            value = var.get()
+
+        
+            if not re.fullmatch(r"^\d*\.?\d*$", value) and value != "":
+                var.set(re.sub(r"[^0-9.]", "", value))  
+
+        
+            if value.count('.') > 1:
+                var.set(value[:value.rfind('.')])  
+
 
     def _validate_initial_soc(self, *args):
         """Ensure Initial SoC is within the Min/Max SoC range."""
         try:
-            min_soc = self.min_soc_var.get()
-            max_soc = self.max_soc_var.get()
-            initial_soc = self.initial_soc_var.get()
+            min_soc = float(self.min_soc_var.get()) if self.min_soc_var.get() else 0
+            max_soc = float(self.max_soc_var.get()) if self.max_soc_var.get() else 100
+            initial_soc = float(self.initial_soc_var.get()) if self.initial_soc_var.get() else None
+
+            if initial_soc is None:
+                return  
 
             if min_soc <= initial_soc <= max_soc:
-                self.initial_soc_entry.configure(border_color=Constants.BORDER_COLOR)
+                self.initial_soc_entry.configure(border_color=Constants.BORDER_COLOR)  
                 return True
             else:
-                self.initial_soc_entry.configure(border_color="red")
-                return False
-        except tk.TclError:
-            self.initial_soc_entry.configure(border_color="red")
-            return False
+                self.initial_soc_entry.configure(border_color="red") 
+                return False 
+        except ValueError:
+            pass  
 
     def _notify_parent(self, *args):
         """Notify the parent frame when values change."""

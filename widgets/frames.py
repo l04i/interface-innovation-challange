@@ -532,7 +532,6 @@ class ActionFrame(BaseFrame):
             ]
             dispatch_fields.pop(0)
             dispatch_fields.pop(0)
-            print(dispatch_fields)
             for field in dispatch_fields:
                 if not field:
                     return False

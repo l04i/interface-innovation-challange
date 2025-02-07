@@ -8,7 +8,6 @@ from widgets.frames import (
     DispatchControlFrame,
     SystemConfigurationFrame,
     ActionFrame
-
 )
 
 class ScrollableFrame(ttk.Frame):

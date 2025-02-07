@@ -404,7 +404,7 @@ class SystemConfigurationFrame(BaseFrame):
 
             
             self.thumbnail_label = ctk.CTkLabel(self, image=self.thumbnail, text="")
-            self.thumbnail_label.grid(row=1, column=1, padx=Constants.PAD_X, pady=Constants.PAD_Y, sticky='ew')
+            self.thumbnail_label.grid(row=1, column=1, padx=Constants.PAD_X * 2, pady=Constants.PAD_Y, sticky='e')
 
             
             self.thumbnail_label.bind("<Button-1>", self._open_full_image)

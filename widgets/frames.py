@@ -457,6 +457,7 @@ class ActionFrame(BaseFrame):
             text_color=Constants.TEXT_COLOR,
             bg_color=Constants.SECTION_BG,
             corner_radius=7,
+            state='disabled',
             hover=False,
             command=self._run_process  
         )

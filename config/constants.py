@@ -1,0 +1,20 @@
+class Constants:
+    WINDOW_SIZE = "900x600"
+    BG_COLOR = "#272727"
+    SECTION_BG = "#373737"
+    TEXT_COLOR = "#EEEEEE"
+    ENTRY_COLOR = "#404040"
+    ACCENT_COLOR = "#1E90FF"
+    FIELD_COLOR =  "#D3D3D3"
+    BORDER_COLOR = "#666666"
+    ACCENT_COLOR = "#00B050"
+    TEXT_COLOR_DISABLED = "#666666"
+    FIELD_COLOR_DISABLED = "#505050"
+    
+    FONT_NAME = "Lato"
+    BASE_FONT_SIZE = 12
+    LABEL_FONT = (FONT_NAME, 12, "bold")
+    TITLE_FONT = (FONT_NAME, 16, "bold")
+    PAD_X = 10
+    PAD_Y = 5
+    ENTRY_WIDTH = 40

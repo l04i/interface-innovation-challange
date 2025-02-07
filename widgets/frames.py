@@ -390,7 +390,7 @@ class SystemConfigurationFrame(BaseFrame):
         """Add a thumbnail with an icon to the frame."""
         try:
             
-            icon_image = Image.open("imgs/thumb.png").convert("RGBA")  
+            icon_image = Image.open("imgs/ico.png").convert("RGBA")  
             icon_size = (50, 50)  
             icon_image.thumbnail(icon_size)
 
@@ -404,7 +404,7 @@ class SystemConfigurationFrame(BaseFrame):
 
             
             self.thumbnail_label = ctk.CTkLabel(self, image=self.thumbnail, text="")
-            self.thumbnail_label.grid(row=1, column=0, padx=Constants.PAD_X, pady=Constants.PAD_Y, sticky='w')
+            self.thumbnail_label.grid(row=1, column=1, padx=Constants.PAD_X, pady=Constants.PAD_Y, sticky='ew')
 
             
             self.thumbnail_label.bind("<Button-1>", self._open_full_image)
